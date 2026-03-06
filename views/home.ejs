@@ -57,7 +57,11 @@
                     by changing a number in the URL. No authorization check.
                 </p>
                 <p><strong>Where:</strong> Profile page — view others' private data by changing the ID.</p>
+                <% if (user) { %>
+                <a href="/profile/<%= user.id %>" class="vuln-link">Try it →</a>
+                <% } else { %>
                 <a href="/login" class="vuln-link">Login first →</a>
+                <% } %>
             </div>
 
             <div class="card vuln-card csrf">
@@ -68,7 +72,11 @@
                     page. An attacker can trick your browser into making unintended requests.
                 </p>
                 <p><strong>Where:</strong> Change Password page — no CSRF token protection.</p>
+                <% if (user) { %>
+                <a href="/change-password" class="vuln-link">Try it →</a>
+                <% } else { %>
                 <a href="/login" class="vuln-link">Login first →</a>
+                <% } %>
             </div>
         </div>
 
