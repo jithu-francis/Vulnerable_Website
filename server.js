@@ -129,6 +129,16 @@ app.post('/guestbook', (req, res) => {
   res.redirect('/guestbook');
 });
 
+// Delete guestbook comment (admin only)
+app.post('/guestbook/delete/:id', (req, res) => {
+  const user = getLoggedInUser(req);
+  if (!user || user.role !== 'admin') {
+    return res.status(403).send('Only admins can delete comments');
+  }
+  db.prepare('DELETE FROM guestbook WHERE id = ?').run(req.params.id);
+  res.redirect('/guestbook');
+});
+
 // ─── NETWORK TOOLS (Vulnerability #3: Command Injection) ─
 app.get('/tools', (req, res) => {
   const user = getLoggedInUser(req);
