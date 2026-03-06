@@ -1,0 +1,20 @@
+<!-- partials/footer.ejs -->
+</main>
+<footer class="footer">
+    ⚠️ This application is <strong>intentionally vulnerable</strong>. For educational purposes only.<br>
+    Built for cybersecurity learning — never deploy on a production server.<br>
+    <span style="margin-top: 0.5rem; display: inline-block;">© 2026 Jithu Francis. All rights reserved.</span>
+</footer>
+<script>
+    document.querySelectorAll('.hint-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const content = btn.nextElementSibling;
+            content.classList.toggle('active');
+            btn.textContent = content.classList.contains('active')
+                ? '🔒 Hide Hints' : '💡 Show Attack Hints';
+        });
+    });
+</script>
+</body>
+
+</html>

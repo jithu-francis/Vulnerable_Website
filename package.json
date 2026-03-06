@@ -1,0 +1,16 @@
+{
+  "name": "vulnerable-website",
+  "version": "1.0.0",
+  "description": "Intentionally vulnerable web application for cybersecurity learning",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "cookie-parser": "^1.4.6",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0"
+  }
+}

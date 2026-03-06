@@ -1,0 +1,33 @@
+<!-- partials/header.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BreachMe — Vulnerable Website</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/" class="navbar-brand">
+                <span class="icon">🔓</span>
+                <span>BreachMe</span>
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/login">Login</a>
+                <a href="/guestbook">Guestbook</a>
+                <a href="/tools">Tools</a>
+                <% if (typeof user !=='undefined' && user) { %>
+                    <a href="/profile/<%= user.id %>">Profile</a>
+                    <a href="/change-password">Password</a>
+                    <span class="user-badge">👤 <%= user.username %></span>
+                    <a href="/logout" class="logout-btn">Logout</a>
+                    <% } %>
+            </div>
+        </div>
+    </nav>
+    <main>

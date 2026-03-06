@@ -1,0 +1,91 @@
+<%- include('partials/header') %>
+
+    <section class="hero">
+        <div class="hero-badge">⚠️ Intentionally Vulnerable</div>
+        <h1>Welcome to <span class="gradient-text">BreachMe</span></h1>
+        <p>
+            A deliberately insecure web application designed for learning and practicing
+            web security testing. Explore, exploit, and understand common vulnerabilities.
+        </p>
+    </section>
+
+    <div class="container">
+        <div class="section-header">
+            <h2>🎯 Vulnerability Challenges</h2>
+            <p>Each page contains a real, exploitable vulnerability. Can you find and exploit them all?</p>
+        </div>
+
+        <div class="vuln-grid">
+            <div class="card vuln-card sql">
+                <div class="vuln-tag tag-critical">🔴 Critical</div>
+                <h3>SQL Injection</h3>
+                <p>
+                    <strong>What is it?</strong> When a website puts your input directly into a database
+                    query without checking it. You can trick it into running your own commands.
+                </p>
+                <p><strong>Where:</strong> Login page — bypass authentication without a password.</p>
+                <a href="/login" class="vuln-link">Try it →</a>
+            </div>
+
+            <div class="card vuln-card xss">
+                <div class="vuln-tag tag-critical">🔴 Critical</div>
+                <h3>Stored XSS</h3>
+                <p>
+                    <strong>What is it?</strong> When a website saves your input and displays it to others
+                    without cleaning it. You can inject JavaScript that runs in everyone's browser.
+                </p>
+                <p><strong>Where:</strong> Guestbook — inject a script that executes for every visitor.</p>
+                <a href="/guestbook" class="vuln-link">Try it →</a>
+            </div>
+
+            <div class="card vuln-card cmd">
+                <div class="vuln-tag tag-critical">🔴 Critical</div>
+                <h3>Command Injection</h3>
+                <p>
+                    <strong>What is it?</strong> When a website runs system commands with your input.
+                    You can sneak in extra commands on the server's operating system.
+                </p>
+                <p><strong>Where:</strong> Network Tools page — execute arbitrary OS commands.</p>
+                <a href="/tools" class="vuln-link">Try it →</a>
+            </div>
+
+            <div class="card vuln-card idor">
+                <div class="vuln-tag tag-high">🟡 High</div>
+                <h3>IDOR (Insecure Direct Object Ref)</h3>
+                <p>
+                    <strong>What is it?</strong> When a website lets you access other people's data just
+                    by changing a number in the URL. No authorization check.
+                </p>
+                <p><strong>Where:</strong> Profile page — view others' private data by changing the ID.</p>
+                <a href="/login" class="vuln-link">Login first →</a>
+            </div>
+
+            <div class="card vuln-card csrf">
+                <div class="vuln-tag tag-high">🟡 High</div>
+                <h3>CSRF (Cross-Site Request Forgery)</h3>
+                <p>
+                    <strong>What is it?</strong> When a website doesn't verify requests came from its own
+                    page. An attacker can trick your browser into making unintended requests.
+                </p>
+                <p><strong>Where:</strong> Change Password page — no CSRF token protection.</p>
+                <a href="/login" class="vuln-link">Login first →</a>
+            </div>
+        </div>
+
+        <div class="card mt-4" style="text-align: center;">
+            <h3>🕵️ Bonus: Hidden API Endpoint</h3>
+            <p class="text-muted mt-1">
+                There's also a hidden API that leaks sensitive data. Can you find it?<br>
+                <em>Hint: Try exploring <code>/api/</code> endpoints...</em>
+            </p>
+        </div>
+
+        <div class="card mt-2" style="text-align: center;">
+            <h3>📚 Default Test Accounts</h3>
+            <p class="text-muted mt-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+                admin / admin123 &nbsp;·&nbsp; john / password1 &nbsp;·&nbsp; alice / letmein &nbsp;·&nbsp; bob / qwerty
+            </p>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>

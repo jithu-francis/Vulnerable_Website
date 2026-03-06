@@ -1,0 +1,11 @@
+# VulnLab Database
+vulnerable.db
+vulnerable.db-shm
+vulnerable.db-wal
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,77 @@
+<%- include('partials/header') %>
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>🔑 Login</h1>
+            <p class="subtitle">Vulnerability: SQL Injection (A03:2021)</p>
+        </div>
+
+        <% if (error) { %>
+            <div class="alert alert-error">⚠️ <%= error %>
+            </div>
+            <% } %>
+                <% if (success) { %>
+                    <div class="alert alert-success">✅ <%- success %></div>
+                    <% } %>
+
+                        <% if (user) { %>
+                            <div class="alert alert-success">
+                                ✅ You are logged in as <strong>
+                                    <%= user.username %>
+                                </strong>.
+                                <a href="/profile/<%= user.id %>">View your profile</a> or
+                                <a href="/logout">logout</a>.
+                            </div>
+                            <% } else { %>
+                                <div class="card">
+                                    <form method="POST" action="/login">
+                                        <div class="form-group">
+                                            <label for="username">Username</label>
+                                            <input type="text" id="username" name="username" class="form-control"
+                                                placeholder="Enter your username" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="password">Password</label>
+                                            <input type="password" id="password" name="password" class="form-control"
+                                                placeholder="Enter your password" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                                    </form>
+                                </div>
+                                <% } %>
+
+                                    <div class="hint-box">
+                                        <button class="hint-toggle">💡 Show Attack Hints</button>
+                                        <div class="hint-content">
+                                            <h4>🧠 How SQL Injection Works (Simple Explanation)</h4>
+                                            <p>
+                                                When you type your username, the server puts it <strong>directly inside
+                                                    a database query</strong> like this:
+                                            </p>
+                                            <p><code>SELECT * FROM users WHERE username = &apos;YOUR_INPUT&apos; AND password = &apos;...&apos;</code>
+                                            </p>
+                                            <p>
+                                                If you type something clever, you can <strong>change the query&apos;s
+                                                    meaning</strong>. The single quote
+                                                character <code>&apos;</code> breaks out of the string, and
+                                                <code>--</code> comments out the rest.
+                                            </p>
+
+                                            <h4 class="mt-2">🎯 Try These Payloads</h4>
+                                            <ul>
+                                                <li>Username: <code>&apos; OR 1=1 --</code> (any password) — logs in as
+                                                    the first user</li>
+                                                <li>Username: <code>&apos; OR username=&apos;admin&apos; --</code> —
+                                                    logs in as admin</li>
+                                                <li>Username: <code>admin&apos;--</code> — bypasses password check</li>
+                                            </ul>
+
+                                            <h4 class="mt-2">🛡️ How to Fix It</h4>
+                                            <p>Use <strong>parameterized queries</strong> (prepared statements) instead
+                                                of string concatenation.
+                                                This keeps user input separate from the SQL code.</p>
+                                        </div>
+                                    </div>
+    </div>
+
+    <%- include('partials/footer') %>

@@ -1,0 +1,91 @@
+<%- include('partials/header') %>
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>👤 User Profile</h1>
+            <p class="subtitle">Vulnerability: IDOR — Insecure Direct Object Reference (A01:2021)</p>
+        </div>
+
+        <% if (error) { %>
+            <div class="alert alert-error">⚠️ <%= error %>
+            </div>
+            <% } %>
+
+                <% if (profileUser) { %>
+                    <div class="card profile-card">
+                        <div class="profile-avatar">👤</div>
+                        <h2>
+                            <%= profileUser.username %>
+                        </h2>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">
+                            User ID: <%= profileUser.id %> · Role: <%= profileUser.role %>
+                        </span>
+
+                        <div class="profile-info">
+                            <div class="profile-row">
+                                <span class="profile-label">Username</span>
+                                <span class="profile-value">
+                                    <%= profileUser.username %>
+                                </span>
+                            </div>
+                            <div class="profile-row">
+                                <span class="profile-label">Email</span>
+                                <span class="profile-value">
+                                    <%= profileUser.email %>
+                                </span>
+                            </div>
+                            <div class="profile-row">
+                                <span class="profile-label">Password</span>
+                                <span class="profile-value secret">
+                                    <%= profileUser.password %>
+                                </span>
+                            </div>
+                            <div class="profile-row">
+                                <span class="profile-label">Role</span>
+                                <span class="profile-value">
+                                    <%= profileUser.role %>
+                                </span>
+                            </div>
+                            <div class="profile-row">
+                                <span class="profile-label">Secret Note</span>
+                                <span class="profile-value secret">
+                                    <%= profileUser.secret_note %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+
+                        <div class="hint-box">
+                            <button class="hint-toggle">💡 Show Attack Hints</button>
+                            <div class="hint-content">
+                                <h4>🧠 How IDOR Works (Simple Explanation)</h4>
+                                <p>
+                                    Look at the URL right now — it says <code>/profile/NUMBER</code>. That number is the
+                                    user ID.
+                                    The website loads whatever user matches that ID, <strong>without checking if YOU are
+                                        allowed
+                                        to see that data</strong>.
+                                </p>
+                                <p>
+                                    Just change the number in the URL and see other people's passwords and secrets!
+                                </p>
+
+                                <h4 class="mt-2">🎯 Try These</h4>
+                                <ul>
+                                    <li>Visit <code>/profile/1</code> — admin profile (has a secret key!)</li>
+                                    <li>Visit <code>/profile/2</code> — john's profile</li>
+                                    <li>Visit <code>/profile/3</code> — alice's profile</li>
+                                    <li>Visit <code>/profile/4</code> — bob's profile (has bank PIN!)</li>
+                                    <li>Try incrementing: <code>/profile/5</code>, <code>/profile/6</code>...</li>
+                                </ul>
+
+                                <h4 class="mt-2">🛡️ How to Fix It</h4>
+                                <p>Always check <strong>authorization</strong> — verify that the logged-in user has
+                                    permission
+                                    to access the requested resource before showing the data.</p>
+                            </div>
+                        </div>
+    </div>
+
+    <%- include('partials/footer') %>

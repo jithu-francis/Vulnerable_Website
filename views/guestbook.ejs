@@ -1,0 +1,73 @@
+<%- include('partials/header') %>
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>📝 Guestbook</h1>
+            <p class="subtitle">Vulnerability: Stored Cross-Site Scripting / XSS (A03:2021)</p>
+        </div>
+
+        <div class="card">
+            <form method="POST" action="/guestbook">
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter your name"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" class="form-control" placeholder="Write something..."
+                        required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+        </div>
+
+        <div class="comment-list">
+            <h3 class="mb-2">💬 Comments (<%= comments.length %>)</h3>
+            <% comments.forEach(function(c) { %>
+                <div class="comment-item">
+                    <div class="comment-meta">
+                        <span class="comment-author"><%- c.name %></span>
+                        <span class="comment-date">
+                            <%= c.created_at %>
+                        </span>
+                    </div>
+                    <div class="comment-body"><%- c.message %></div>
+                </div>
+                <% }); %>
+        </div>
+
+        <div class="hint-box">
+            <button class="hint-toggle">💡 Show Attack Hints</button>
+            <div class="hint-content">
+                <h4>🧠 How Stored XSS Works (Simple Explanation)</h4>
+                <p>
+                    When you post a comment, the website saves it to the database. When anyone visits this page,
+                    the comment is displayed <strong>exactly as you typed it — including HTML and JavaScript
+                        code</strong>.
+                </p>
+                <p>
+                    If you write a <code>&lt;script&gt;</code> tag in your message, the browser will
+                    <strong>execute it as real code</strong> for every visitor who sees the page.
+                </p>
+
+                <h4 class="mt-2">🎯 Try These Payloads</h4>
+                <ul>
+                    <li><code>&lt;script&gt;alert(&apos;XSS&apos;)&lt;/script&gt;</code> — pops an alert box</li>
+                    <li><code>&lt;img src=x onerror="alert(&apos;Hacked!&apos;)"&gt;</code> — XSS via image error</li>
+                    <li><code>&lt;script&gt;document.body.style.background=&apos;red&apos;&lt;/script&gt;</code> —
+                        changes page</li>
+                    <li><code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code> — steals cookies (try while
+                        logged in!)</li>
+                </ul>
+
+                <h4 class="mt-2">🛡️ How to Fix It</h4>
+                <p>Always <strong>escape/sanitize</strong> user input before displaying it. In EJS, use
+                    <code>&lt;%= %&gt;</code> (auto-escapes) instead of <code>&lt;%- %&gt;</code> (renders raw HTML).
+                    Also add a Content Security Policy (CSP) header.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>

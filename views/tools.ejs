@@ -1,0 +1,63 @@
+<%- include('partials/header') %>
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>🛠️ Network Tools</h1>
+            <p class="subtitle">Vulnerability: Command Injection (A03:2021)</p>
+        </div>
+
+        <div class="card">
+            <form method="POST" action="/tools">
+                <div class="form-group">
+                    <label for="target">Ping Target (IP or Hostname)</label>
+                    <input type="text" id="target" name="target" class="form-control" placeholder="e.g. 127.0.0.1"
+                        value="<%= target %>" required>
+                </div>
+                <button type="submit" class="btn btn-primary">🔍 Ping</button>
+            </form>
+        </div>
+
+        <% if (output) { %>
+            <div class="output-box">
+                <div class="output-header">📟 Command Output</div>
+                <div class="output-body">
+                    <%= output %>
+                </div>
+            </div>
+            <% } %>
+
+                <div class="hint-box">
+                    <button class="hint-toggle">💡 Show Attack Hints</button>
+                    <div class="hint-content">
+                        <h4>🧠 How Command Injection Works (Simple Explanation)</h4>
+                        <p>
+                            This tool runs the <code>ping</code> command on the server. The problem is, it puts your
+                            input <strong>directly into the command</strong> without checking it. In a terminal, you can
+                            chain multiple commands using <code>;</code> or <code>&amp;&amp;</code> or <code>|</code>.
+                        </p>
+                        <p>
+                            So if the server runs <code>ping -c 2 YOUR_INPUT</code>, and you type
+                            <code>127.0.0.1; whoami</code>, the server actually runs TWO commands:
+                            ping AND whoami.
+                        </p>
+
+                        <h4 class="mt-2">🎯 Try These Payloads</h4>
+                        <ul>
+                            <li><code>127.0.0.1; whoami</code> — shows the server username</li>
+                            <li><code>127.0.0.1; ls -la</code> — lists files on the server</li>
+                            <li><code>127.0.0.1; cat /etc/passwd</code> — reads the password file (Linux)</li>
+                            <li><code>127.0.0.1; cat server.js</code> — reads the server source code!</li>
+                            <li><code>127.0.0.1; env</code> — shows environment variables</li>
+                            <li><code>127.0.0.1 | id</code> — shows user/group info (using pipe)</li>
+                        </ul>
+
+                        <h4 class="mt-2">🛡️ How to Fix It</h4>
+                        <p>Never pass user input directly to shell commands. Instead:
+                            <strong>validate</strong> the input is a valid IP/hostname using regex,
+                            or use a library that doesn't invoke a shell.
+                        </p>
+                    </div>
+                </div>
+    </div>
+
+    <%- include('partials/footer') %>
