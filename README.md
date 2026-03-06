@@ -457,31 +457,6 @@ Visit `http://localhost:3000/api/users` in your browser. It returns **ALL user d
 
 This simulates a common real-world issue where developers forget to secure internal API endpoints.
 
----
-
-## 🎨 Design Decisions
-
-### Dark Theme
-Used a **cybersecurity/hacker aesthetic** — dark backgrounds (`#0a0a0f`) with purple (`#8b5cf6`) and red (`#ef4444`) accent colors. Glassmorphism effects (blur + transparency) on the navbar. This makes it feel like a legitimate security tool.
-
-### Hint System
-Each vulnerability page has a **collapsible hint box** with three sections:
-1. **🧠 How it Works** — simple beginner-friendly explanation
-2. **🎯 Try These** — ready-to-use attack payloads
-3. **🛡️ How to Fix** — the secure code pattern
-
-This teaches **attack AND defense** simultaneously.
-
-### Mobile Responsive
-Two CSS breakpoints:
-- **768px (tablet)** — nav wraps, cards stack, profile rows stack vertically
-- **480px (mobile)** — everything scales down for phone screens
-
-### Partials Architecture
-The `header.ejs` and `footer.ejs` partials are included on every page. This means:
-- Navigation is consistent everywhere
-- Changes (like renaming to BreachMe) only need one edit
-- The copyright appears on every page automatically
 
 ---
 
