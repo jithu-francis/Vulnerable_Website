@@ -11,8 +11,8 @@ services:
     deploy:
       resources:
         limits:
-          memory: 200M
-          cpus: '0.4'
+          memory: 180M
+          cpus: '0.3'
     # ISOLATION
     networks:
       - breachme_lab_net
@@ -24,4 +24,5 @@ services:
 
 networks:
   breachme_lab_net:
-    external: true
+    driver: bridge
+    internal: false
