@@ -3,6 +3,8 @@
 > A deliberately insecure web application built for **cybersecurity learning**. Practice exploiting real vulnerabilities in a safe environment.
 
 > ⚠️ **DISCLAIMER**: This application is **intentionally vulnerable**. It must **never** be deployed on a production server. For **educational and ethical hacking purposes only**. Only attack systems you own or have explicit permission to test.
+>
+> 🚨 **PUBLIC HOSTING WARNING**: If you are hosting this on a public IP, **BE CAREFUL!** Since it features Command Injection (RCE), SSRF, and LFI, anyone on the internet can get a shell on your container, read sensitive files, or use your server to scan your internal network. **Ensure it is heavily isolated** using Docker, unprivileged users, and strict firewall rules to prevent outgoing traffic (so attackers can't pivot internally).
 
 ---
 
@@ -49,6 +51,8 @@ Vulnerable_Website/
     ├── login.ejs            ← SQL Injection target
     ├── guestbook.ejs        ← Stored XSS target
     ├── tools.ejs            ← Command Injection target
+    ├── files.ejs            ← Local File Inclusion (LFI) target
+    ├── proxy.ejs            ← Server-Side Request Forgery (SSRF) target
     ├── profile.ejs          ← IDOR target
     └── change-password.ejs  ← CSRF target
 ```
@@ -441,6 +445,93 @@ app.post('/change-password', (req, res) => {
   }
   // Also require the CURRENT password before changing
 });
+```
+
+---
+
+## Vulnerability #6: Local File Inclusion (LFI) / Path Traversal
+
+### 📍 Where: File Viewer Page (`/read`)
+
+### 🧠 What is LFI / Path Traversal? (Simple Explanation)
+
+The application has a feature to read and display a file from its `public` folder. However, it takes the filename you give it and blindly puts it at the end of the directory path: `/app/public/` + `YOUR_FILE`.
+
+If you use `../`, which means "go up one directory folder", you can escape the `public` folder and read anything on the system!
+
+### 🎮 Try These Attacks
+
+| Enter in the file box | What it does |
+|-----------------------|-------------|
+| `style.css` | Normal usage, reads the safe public file |
+| `../package.json` | Breaks out of `public/` and reads project dependencies |
+| `../server.js` | Reads the entire backend source code |
+| `../../../../../../etc/passwd` | Reads the Linux system users file |
+| `../vulnerable.db` | Dumps the exact SQLite database |
+
+### 🔍 Vulnerable Code (`server.js`)
+
+```javascript
+// 🔴 VULNERABLE: Directly using user input to form file paths
+const filePath = path.join(__dirname, 'public', file);
+const content = fs.readFileSync(filePath, 'utf-8');
+```
+
+### 🛡️ How to Fix
+
+Ensure the resulting path is actually inside the directory you intended:
+
+```javascript
+// ✅ SAFE: Resolve the path and verify it starts with the target directory
+const targetDir = path.resolve(__dirname, 'public');
+const filePath = path.resolve(targetDir, file);
+
+if (!filePath.startsWith(targetDir)) {
+  return res.status(403).send('Directory traversal detected');
+}
+```
+
+---
+
+## Vulnerability #7: Server-Side Request Forgery (SSRF)
+
+### 📍 Where: Web Fetcher Page (`/proxy`)
+
+### 🧠 What is SSRF? (Simple Explanation)
+
+The application has a feature to fetch an external website and display it to you. Usually, you provide `https://google.com`. But what if you provide an **internal** address, like `http://localhost:3000` or `http://192.168.1.1`?
+
+Because the **server** is the one making the request, it can talk to internal tools, APIs, and databases that are normally blocked from the outside internet by firewalls!
+
+### 🎮 Try These Attacks
+
+| Enter in the url box | What it does |
+|----------------------|-------------|
+| `http://localhost:3000/api/users` | Reads the internal app's API without being constrained by browser CORS |
+| `http://127.0.0.1:3000/profile/1` | Views pages bypassing standard IP location firewalls (looks like a local user) |
+| `http://169.254.169.254/latest/meta-data/` | If hosted on AWS, reads secret cloud instance metadata! |
+| `file:///etc/passwd` | (If `fetch` or the client library allowed files) Reads system files |
+
+### 🔍 Vulnerable Code (`server.js`)
+
+```javascript
+// 🔴 VULNERABLE: Blindly requesting whatever URL the user provided
+const response = await fetch(targetUrl);
+const result = await response.text();
+```
+
+### 🛡️ How to Fix
+
+You must parse the URL and verify that it doesn't resolve to private or loopback IP blocks!
+
+```javascript
+// ✅ SAFE: Basic protection approach
+const parsedUrl = new URL(targetUrl);
+if (['localhost', '127.0.0.1'].includes(parsedUrl.hostname)) {
+  throw new Error("Local addresses are blocked!");
+}
+// Note: Robust protection requires checking the IP *after* DNS resolution 
+// to prevent DNS rebinding attacks.
 ```
 
 ---

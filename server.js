@@ -3,6 +3,7 @@ const Database = require('better-sqlite3');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const { execSync } = require('child_process');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -158,6 +159,47 @@ app.post('/tools', (req, res) => {
     res.render('tools', { user, output, target });
   } catch (err) {
     res.render('tools', { user, output: err.message || 'Command failed', target });
+  }
+});
+
+// ─── FILE VIEWER (Vulnerability #6: Local File Inclusion / Path Traversal) ─
+app.get('/read', (req, res) => {
+  const user = getLoggedInUser(req);
+  const file = req.query.file;
+
+  if (!file) {
+    return res.render('files', { user, selectedFile: '', content: null, error: null });
+  }
+
+  // 🔴 VULNERABLE: No path validation/sanitization
+  // Allows directory traversal (e.g. ?file=../server.js)
+  try {
+    const filePath = path.join(__dirname, 'public', file);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    res.render('files', { user, selectedFile: file, content, error: null });
+  } catch (err) {
+    res.render('files', { user, selectedFile: file, content: null, error: `Error reading file: ${err.message}` });
+  }
+});
+
+// ─── WEB FETCHER (Vulnerability #7: Server-Side Request Forgery) ─
+app.get('/proxy', (req, res) => {
+  const user = getLoggedInUser(req);
+  res.render('proxy', { user, url: '', result: null, error: null });
+});
+
+app.post('/proxy', async (req, res) => {
+  const user = getLoggedInUser(req);
+  const targetUrl = req.body.url;
+
+  // 🔴 VULNERABLE: No validation on target URL
+  // The server blindly requests the URL. Allows reaching internal endpoints.
+  try {
+    const response = await fetch(targetUrl);
+    const result = await response.text();
+    res.render('proxy', { user, url: targetUrl, result, error: null });
+  } catch (err) {
+    res.render('proxy', { user, url: targetUrl, result: null, error: `Fetch failed: ${err.message}` });
   }
 });
 

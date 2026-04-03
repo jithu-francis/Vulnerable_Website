@@ -1,0 +1,56 @@
+<%- include('partials/header') %>
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>📂 File Viewer</h1>
+            <p class="subtitle">Vulnerability: Local File Inclusion / Path Traversal (A01:2021)</p>
+        </div>
+
+        <div class="card">
+            <form method="GET" action="/read">
+                <div class="form-group">
+                    <label for="file">File to Read (from public folder)</label>
+                    <input type="text" id="file" name="file" class="form-control" placeholder="e.g. style.css" required value="<%= typeof selectedFile !== 'undefined' ? selectedFile : '' %>">
+                </div>
+                <button type="submit" class="btn btn-primary">📖 Read File</button>
+            </form>
+        </div>
+
+        <% if (typeof content !== 'undefined') { %>
+            <div class="output-box">
+                <div class="output-header">📄 File Contents (<%= selectedFile %>)</div>
+                <div class="output-body">
+                    <% if (error) { %>
+                        <span style="color: red;"><%= error %></span>
+                    <% } else { %>
+                        <pre style="white-space: pre-wrap; font-family: monospace; font-size: 14px; margin: 0;"><%= content %></pre>
+                    <% } %>
+                </div>
+            </div>
+        <% } %>
+
+        <div class="hint-box">
+            <button class="hint-toggle">💡 Show Attack Hints</button>
+            <div class="hint-content">
+                <h4>🧠 How LFI / Path Traversal Works</h4>
+                <p>
+                    This tool lets you read files from the server's <code>public</code> directory. However, it blindly joins the path you provide with the base directory without checking if the resulting path stays within the <code>public</code> directory. You can use <code>../</code> to go up a folder and read files outside of the intended directory.
+                </p>
+
+                <h4 class="mt-2">🎯 Try These Payloads</h4>
+                <ul>
+                    <li><code>../package.json</code> — Reads the Node.js project file</li>
+                    <li><code>../server.js</code> — Reads the backend source code</li>
+                    <li><code>../../../../../../etc/passwd</code> — Reads the system password file on Linux</li>
+                    <li><code>../vulnerable.db</code> — Downloads or reads the SQLite database!</li>
+                </ul>
+                
+                <h4 class="mt-2">🛡️ How to Fix It</h4>
+                <p>Ensure that the resolved file path starts with the intended base directory.
+                    For example, using <code>path.resolve</code> and checking if it <code>startsWith</code> the public folder's absolute path.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>

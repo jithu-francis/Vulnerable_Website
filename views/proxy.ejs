@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>🌐 Web Fetcher</h1>
+            <p class="subtitle">Vulnerability: Server-Side Request Forgery / SSRF (A10:2021)</p>
+        </div>
+
+        <div class="card">
+            <form method="POST" action="/proxy">
+                <div class="form-group">
+                    <label for="url">URL to Fetch</label>
+                    <input type="text" id="url" name="url" class="form-control" placeholder="https://example.com" required value="<%= typeof url !== 'undefined' ? url : '' %>">
+                </div>
+                <button type="submit" class="btn btn-primary">🚀 Fetch URL</button>
+            </form>
+        </div>
+
+        <% if (typeof result !== 'undefined') { %>
+            <div class="output-box">
+                <div class="output-header">📥 Response from (<%= url %>)</div>
+                <div class="output-body" style="background: white; border-radius: 5px; color: black; padding: 10px; overflow-x: auto;">
+                    <% if (error) { %>
+                        <span style="color: red; font-weight: bold;"><%= error %></span>
+                    <% } else { %>
+                        <iframe srcdoc="<%= encodeURIComponent(result).replace(/'/g, "\\'") %>" onload="this.srcdoc = decodeURIComponent(this.srcdoc);" style="width: 100%; height: 500px; border: none; background: white; border-radius: 5px;" sandbox></iframe>
+                        <div style="margin-top: 15px;">
+                            <h5>Raw Output Response:</h5>
+                            <pre style="white-space: pre-wrap; font-size: 12px; background: #f4f4f4; border: 1px solid #ccc; padding: 10px; border-radius: 4px; color: #333; max-height: 250px; overflow-y: auto;"><%= result %></pre>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        <% } %>
+
+        <div class="hint-box">
+            <button class="hint-toggle">💡 Show Attack Hints</button>
+            <div class="hint-content">
+                <h4>🧠 How SSRF Works</h4>
+                <p>
+                    This tool fetches the content of a remote URL and shows it to you. But since the <strong>backend server</strong> is the one making the request, it can fetch resources that you normally couldn't reach over the internet, like internal services or the server's own internal endpoints (localhost).
+                </p>
+
+                <h4 class="mt-2">🎯 Try These Payloads</h4>
+                <ul>
+                    <li><code>http://localhost:3000/api/users</code> — Fetches the internal API that leaks sensitive data without needing to solve CORS!</li>
+                    <li><code>http://169.254.169.254/latest/meta-data/</code> — Well-known AWS metadata endpoint (if hosted on AWS).</li>
+                    <li><code>http://127.0.0.1:3000/profile/1</code> — Access local pages acting as an unauthenticated internal user, sometimes bypassing outer WAF.</li>
+                </ul>
+
+                <h4 class="mt-2">🛡️ How to Fix It</h4>
+                <p>Validate the URL string, parse the hostname, ensure that it resolves to public IPs and not local subnets (`127.0.0.1`, `10.x.x.x`, `192.168.x.x`) before initiating the request.</p>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
